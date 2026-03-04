@@ -1,17 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CommonModule } from './common/common.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { CommonModule } from './common/common.module';
-import { TaskModule } from './task/task.module';
-import { CommonResolver } from './common/common.resolver';
-import { CommonService } from './common/common.service';
-import { CommonModule } from './common/common.module';
+import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [CommonModule, TaskModule, PrismaModule],
-  controllers: [AppController],
-  providers: [AppService, CommonService, CommonResolver],
+  imports: [
+    PrismaModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
+  ],
 })
 export class AppModule {}
