@@ -6,7 +6,7 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UserService } from './users.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import type { JwtPayload } from 'src/common/types';
 import { AuthGuard } from 'src/auth/auth.guard';
