@@ -84,8 +84,9 @@ export class UsersService {
       throw new UnauthorizedException('Passwords do not match');
     }
 
-    const saltRounds =
-      this.configService.getOrThrow<number>('BCRYPT_SALT_ROUNDS');
+    const saltRounds = Number(
+      this.configService.getOrThrow('BCRYPT_SALT_ROUNDS'),
+    );
     const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
 
     await this.prismaService.user.update({

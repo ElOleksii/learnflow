@@ -30,8 +30,9 @@ export class AuthService {
       throw new ConflictException('Email already in use');
     }
 
-    const saltRounds =
-      this.configService.getOrThrow<number>('BCRYPT_SALT_ROUNDS');
+    const saltRounds = Number(
+      this.configService.getOrThrow('BCRYPT_SALT_ROUNDS'),
+    );
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const createdUser = await this.prisma.user.create({
