@@ -7,7 +7,7 @@ import { UpdateSubjectDto } from './dto/update-subject.dto';
 export class SubjectsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getAll(userId: string) {
+  async findAll(userId: string) {
     const subjects = await this.prismaService.subject.findMany({
       where: { userId },
     });
@@ -30,7 +30,7 @@ export class SubjectsService {
     return subject;
   }
 
-  async createSubject(userId: string, data: CreateSubjectDto) {
+  async create(userId: string, data: CreateSubjectDto) {
     return await this.prismaService.subject.create({
       data: {
         userId,
@@ -39,11 +39,7 @@ export class SubjectsService {
     });
   }
 
-  async updateSubject(
-    userId: string,
-    subjectId: string,
-    data: UpdateSubjectDto,
-  ) {
+  async update(userId: string, subjectId: string, data: UpdateSubjectDto) {
     const subject = await this.prismaService.subject.findUnique({
       where: { id: subjectId, userId },
     });
@@ -61,7 +57,14 @@ export class SubjectsService {
     });
   }
 
-  async deleteSubject(userId: string, subjectId: string) {
+  async delete(userId: string, subjectId: string) {
+    const subject = await this.prismaService.subject.findUnique({
+      where: { id: subjectId, userId },
+    });
+
+    if (!subject) {
+      throw new NotFoundException();
+    }
     await this.prismaService.subject.delete({
       where: {
         id: subjectId,
