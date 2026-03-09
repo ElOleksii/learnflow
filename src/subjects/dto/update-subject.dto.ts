@@ -1,10 +1,5 @@
 import { IsInt, Min, Max, IsOptional, IsEnum } from 'class-validator';
-
-export enum SubjectStatus {
-  ACTIVE = 'ACTIVE',
-  PAUSED = 'PAUSED',
-  COMPLETED = 'COMPLETED',
-}
+import { SubjectStatus } from 'src/common/types';
 
 export class UpdateSubjectDto {
   @IsOptional()
