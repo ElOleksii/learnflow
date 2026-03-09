@@ -56,4 +56,35 @@ export class TopicsService {
       data,
     });
   }
+
+  async getSortedTopics(subjectId: string) {
+    const topics = await this.prismaService.topic.findMany({
+      where: {
+        subjectId,
+      },
+      include: { prerequisites: true, prerequisitesFor: true },
+    });
+
+    const sorted: typeof topics = [];
+    const visited = new Set<string>();
+
+    for (const topic of topics) {
+      if (!visited.has(topic.id)) {
+        visit(topic);
+      }
+    }
+
+    return sorted;
+
+    function visit(topic: (typeof topics)[number]) {
+      if (visited.has(topic.id)) return;
+
+      for (const p of topic.prerequisites) {
+        visit(p as typeof topic);
+      }
+
+      visited.add(topic.id);
+      sorted.push(topic);
+    }
+  }
 }
