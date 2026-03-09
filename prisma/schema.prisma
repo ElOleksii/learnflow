@@ -39,7 +39,7 @@ model Subject {
   id String @id @default(uuid())
   name String
   description String?
-  hoursPerWeek Int @map("hours_per_week")
+  hoursPerWeek Int @map("hours_per_week") @default(0)
   status SubjectStatus @default(ACTIVE)
   userId String @map("user_id")
 
