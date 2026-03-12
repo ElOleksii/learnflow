@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TopicStatus } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateTopicStatus } from './dto/update-topic-status.dto';
 
 @Injectable()
 export class TopicsService {
@@ -26,7 +27,7 @@ export class TopicsService {
   async updateTopicStatus(
     userId: string,
     topicId: string,
-    status: TopicStatus,
+    dto: UpdateTopicStatus,
   ) {
     const topic = await this.prismaService.topic.findUnique({
       where: { id: topicId },
@@ -35,6 +36,8 @@ export class TopicsService {
 
     if (!topic || topic.subject.userId !== userId)
       throw new NotFoundException();
+
+    const { status } = dto;
 
     const data: Partial<{
       status: TopicStatus;
