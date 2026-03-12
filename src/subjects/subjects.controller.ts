@@ -15,12 +15,16 @@ import type { JwtPayload } from 'src/common/types';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { TopicsService } from 'src/topics/topics.service';
 
 @UseGuards(AuthGuard)
 @ApiTags('Subjects')
 @Controller('subjects')
 export class SubjectsController {
-  constructor(private readonly subjectsService: SubjectsService) {}
+  constructor(
+    private readonly subjectsService: SubjectsService,
+    private readonly topicsService: TopicsService,
+  ) {}
 
   @Get()
   getAll(@CurrentUser() user: JwtPayload) {
@@ -49,5 +53,10 @@ export class SubjectsController {
   @Delete(':id')
   delete(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
     return this.subjectsService.delete(user.sub, id);
+  }
+
+  @Get(':id/topics')
+  getTopicsBySubject(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.topicsService.getTopicsBySubject(user.sub, id);
   }
 }
