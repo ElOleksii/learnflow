@@ -72,6 +72,10 @@ export class TopicsService {
     if (!subject) {
       throw new NotFoundException();
     }
+    // Deletes all topics on subject if they're exist
+    await this.prismaService.topic.deleteMany({
+      where: { subjectId: subject.id },
+    });
 
     const topicsArr = await this.aiService.generateRoadmap(subject.name);
 
