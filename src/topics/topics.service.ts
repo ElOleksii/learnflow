@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { TopicStatus } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateTopicStatus } from './dto/update-topic-status.dto';
+import { AiService } from 'src/ai/ai.service';
 
 @Injectable()
 export class TopicsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private aiService: AiService,
+  ) {}
   async getTopicsBySubject(userId: string, subjectId: string) {
     const subject = await this.prismaService.subject.findUnique({
       where: {
@@ -58,6 +62,54 @@ export class TopicsService {
       },
       data,
     });
+  }
+
+  async generateRoadmapBySubject(userId: string, subjectId: string) {
+    const subject = await this.prismaService.subject.findUnique({
+      where: { id: subjectId, userId },
+    });
+
+    if (!subject) {
+      throw new NotFoundException();
+    }
+
+    const topicsArr = await this.aiService.generateRoadmap(subject.name);
+
+    const createdTopics = await Promise.all(
+      topicsArr.map((t) =>
+        this.prismaService.topic.create({
+          data: {
+            subjectId: subject.id,
+            name: t.name,
+            description: t.description,
+            order: t.order,
+            estimatedHours: t.estimatedHours,
+          },
+        }),
+      ),
+    );
+
+    const topicMap = new Map(createdTopics.map((t) => [t.name, t.id]));
+
+    for (const topic of topicsArr) {
+      if (!topic.prerequisites.length) continue;
+
+      const topicId = topicMap.get(topic.name);
+
+      await this.prismaService.topic.update({
+        where: { id: topicId },
+        data: {
+          prerequisites: {
+            connect: topic.prerequisites
+              .map((name) => topicMap.get(name))
+              .filter(Boolean)
+              .map((id) => ({ id: id })),
+          },
+        },
+      });
+    }
+
+    return createdTopics;
   }
 
   async getSortedTopics(subjectId: string) {

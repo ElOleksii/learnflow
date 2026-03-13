@@ -59,4 +59,9 @@ export class SubjectsController {
   getTopicsBySubject(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
     return this.topicsService.getTopicsBySubject(user.sub, id);
   }
+
+  @Get(':id/roadmap')
+  generateRoadmap(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.topicsService.generateRoadmapBySubject(user.sub, id);
+  }
 }

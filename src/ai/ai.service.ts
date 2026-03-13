@@ -18,10 +18,19 @@ export class AiService {
   }
 
   async generateRoadmap(subjectName: string): Promise<GeneratedTopic[]> {
-    const prompt = `Your goal is create roadmap for learning ${subjectName}. Return ONLY a raw JSON array. No markdown, no code blocks, no explanation. Just the JSON array itself. It must contain array of topics with name, short description, estimated hours, order, and prerequisites (array of topic names that must be learned first).`;
+    const prompt = `Your goal is create roadmap for learning ${subjectName}. 
+    Return ONLY valid JSON.
+    Each topic MUST contain:
+    - name (string)
+    - description (string)
+    - estimatedHours (number)
+    - order (number)
+    - prerequisites (array of topic names)
+
+    estimatedHours MUST be a number.`;
 
     const res = await this.ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
     });
 
@@ -29,8 +38,10 @@ export class AiService {
       throw new InternalServerErrorException('AI returned empty response');
     }
 
+    const cleanText = res.text.replace(/```json|```/g, '').trim();
+
     try {
-      const json = JSON.parse(res.text) as GeneratedTopic[];
+      const json = JSON.parse(cleanText) as GeneratedTopic[];
       return json;
     } catch (e) {
       console.error(e);
