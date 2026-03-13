@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoogleGenAI } from '@google/genai';
 import { ConfigService } from '@nestjs/config';
+import { generateRoadmapPrompt } from './prompt';
 
 interface GeneratedTopic {
   name: string;
@@ -18,20 +19,9 @@ export class AiService {
   }
 
   async generateRoadmap(subjectName: string): Promise<GeneratedTopic[]> {
-    const prompt = `Your goal is create roadmap for learning ${subjectName}. 
-    Return ONLY valid JSON.
-    Each topic MUST contain:
-    - name (string)
-    - description (string)
-    - estimatedHours (number)
-    - order (number)
-    - prerequisites (array of topic names)
-
-    estimatedHours MUST be a number.`;
-
     const res = await this.ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: prompt,
+      contents: generateRoadmapPrompt(subjectName),
     });
 
     if (!res.text) {
