@@ -87,7 +87,7 @@ export class UsersController {
     @CurrentUser() currentUser: JwtPayload,
     @Body() data: UpdatePasswordDto,
   ) {
-    return this.userService.updatePassowrd(currentUser.sub, data);
+    return this.userService.updatePassword(currentUser.sub, data);
   }
 
   @ApiOperation({

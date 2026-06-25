@@ -65,7 +65,7 @@ export class UsersService {
     return { email, name };
   }
 
-  async updatePassowrd(userId: string, data: UpdatePasswordDto) {
+  async updatePassword(userId: string, data: UpdatePasswordDto) {
     const { oldPassword, newPassword } = data;
 
     const user = await this.prismaService.user.findUnique({
