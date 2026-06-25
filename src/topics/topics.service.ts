@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TopicStatus } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateTopicStatus } from './dto/update-topic-status.dto';
@@ -43,25 +47,48 @@ export class TopicsService {
 
     const { status } = dto;
 
-    const data: Partial<{
-      status: TopicStatus;
-      reviewInterval?: number;
-      nextReviewDate?: Date;
-    }> = { status };
+    if (status === TopicStatus.DONE) {
+      const interval = 1;
 
-    if (status === TopicStatus.NEEDS_REVIEW) {
-      data.reviewInterval = 1;
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
-      data.nextReviewDate = tomorrow;
+      const existing = await this.prismaService.review.findUnique({
+        where: {
+          topicId,
+        },
+      });
+
+      if (existing) {
+        throw new ConflictException();
+      }
+
+      const [review, updatedTopic] = await this.prismaService.$transaction([
+        this.prismaService.review.create({
+          data: {
+            topicId,
+            userId,
+            nextReviewDate: tomorrow,
+            interval,
+          },
+        }),
+        this.prismaService.topic.update({
+          where: {
+            id: topicId,
+          },
+          data: {
+            status,
+          },
+        }),
+      ]);
+
+      return { updatedTopic, review };
+    } else {
+      return await this.prismaService.topic.update({
+        where: { id: topic.id },
+        data: { status },
+      });
     }
-
-    return this.prismaService.topic.update({
-      where: {
-        id: topicId,
-      },
-      data,
-    });
   }
 
   async generateRoadmapBySubject(userId: string, subjectId: string) {
