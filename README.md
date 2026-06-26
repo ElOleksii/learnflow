@@ -1,98 +1,160 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Learnflow API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Personal learning system - an AI-powered study planner. Learnflow lets users organize what they want to learn into **subjects**, then uses Google Gemini to generate a structured **roadmap of topics** (with estimated effort and prerequisites) for each subject. Topic progress is tracked and, when a topic is marked done, a spaced-repetition **review** is scheduled.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Built with [NestJS](https://nestjs.com/), [Prisma](https://www.prisma.io/) (PostgreSQL), and the [Google Gen AI SDK](https://ai.google.dev/).
 
-## Description
+## Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **JWT authentication** - register/login with bcrypt-hashed passwords and bearer-token auth.
+- **Subjects** - full CRUD over the things a user is learning.
+- **AI roadmap generation** - generate an ordered list of topics for a subject via Gemini (`gemini-2.5-flash`), including descriptions, estimated hours, and topic prerequisites.
+- **Topic progress tracking** - update topic status (`NOT_STARTED`, `IN_PROGRESS`, `DONE`, `NEEDS_REVIEW`).
+- **Spaced repetition** - marking a topic `DONE` creates a `Review` record with an ease factor / interval / repetition count and a next-review date.
+- **Swagger docs** - interactive API documentation out of the box.
 
-## Project setup
+## Tech Stack
 
-```bash
-$ npm install
-```
+| Concern    | Choice                                  |
+| ---------- | --------------------------------------- |
+| Framework  | NestJS 11                               |
+| Language   | TypeScript                              |
+| Database   | PostgreSQL via Prisma 7 (`pg` adapter)  |
+| Auth       | `@nestjs/jwt` + bcrypt                  |
+| AI         | `@google/genai` (Gemini)                |
+| Validation | `class-validator` / `class-transformer` |
+| API docs   | `@nestjs/swagger`                       |
+| Scheduling | `@nestjs/schedule`                      |
 
-## Compile and run the project
+## Getting Started
 
-```bash
-# development
-$ npm run start
+### Prerequisites
 
-# watch mode
-$ npm run start:dev
+- Node.js (LTS recommended)
+- A PostgreSQL database
+- A Google Gemini API key
 
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+### Installation
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
+### Environment variables
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Create a `.env` file in the project root:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+```env
+# Server
+PORT=3000
+FRONTEND_URL=http://localhost:5173 # For CORS
+
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/learnflow
+
+# Auth
+JWT_SECRET=your-jwt-secret
+BCRYPT_SALT_ROUNDS=10
+
+# AI
+GEMINI_KEY=your-gemini-api-key
+```
+
+### Database setup
+
+Apply migrations and generate the Prisma client:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma migrate deploy   # or: npx prisma migrate dev
+npx prisma generate
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+The generated client is output to `generated/prisma`.
 
-## Resources
+### Running the app
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+npm run start:dev    # watch mode
+npm run start        # standard
+npm run start:prod   # from compiled dist/
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+The API is served under the global prefix **`/api/v1`** (e.g. `http://localhost:3000/api/v1`).
+Interactive Swagger docs are available at **`http://localhost:3000/api/docs`**.
 
-## Support
+## API Overview
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+All routes are prefixed with `/api/v1`. Everything except `auth/*` requires an `Authorization: Bearer <token>` header.
 
-## Stay in touch
+### Auth
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Method | Endpoint         | Description                        |
+| ------ | ---------------- | ---------------------------------- |
+| POST   | `/auth/register` | Create an account, returns a token |
+| POST   | `/auth/login`    | Log in, returns an access token    |
 
-## License
+### Users
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Method | Endpoint             | Description              |
+| ------ | -------------------- | ------------------------ |
+| GET    | `/users/me`          | Get current user profile |
+| PATCH  | `/users/me`          | Update name / email      |
+| PATCH  | `/users/me/password` | Update password          |
+| DELETE | `/users/me`          | Delete current account   |
+
+### Subjects
+
+| Method | Endpoint                | Description                                                 |
+| ------ | ----------------------- | ----------------------------------------------------------- |
+| GET    | `/subjects`             | List the current user's subjects                            |
+| GET    | `/subjects/:id`         | Get a single subject                                        |
+| POST   | `/subjects`             | Create a subject                                            |
+| PATCH  | `/subjects/:id`         | Update a subject                                            |
+| DELETE | `/subjects/:id`         | Delete a subject                                            |
+| GET    | `/subjects/:id/topics`  | List topics for a subject                                   |
+| GET    | `/subjects/:id/roadmap` | Generate an AI roadmap of topics (replaces existing topics) |
+
+### Topics
+
+| Method | Endpoint             | Description             |
+| ------ | -------------------- | ----------------------- |
+| PATCH  | `/topics/:id/status` | Update a topic's status |
+
+## Data Model
+
+- **User** - owns subjects, schedule items, and reviews; tracks `streakDays` / `lastStudyDate`.
+- **Subject** - a learning goal (`ACTIVE` / `PAUSED` / `COMPLETED`), belongs to a user, has many topics.
+- **Topic** - a unit of study within a subject with `estimatedHours`, an `order`, a status, and self-referential **prerequisites**.
+- **Review** - 1:1 with a topic; holds spaced-repetition state (`easeFactor`, `interval`, `repetitions`, `nextReviewDate`).
+- **ScheduleItem** - links a topic to a user with a scheduled date and status (`WAIT` / `COMPLETED`).
+
+See [`prisma/schema.prisma`](prisma/schema.prisma) for the full schema.
+
+## Scripts
+
+| Script               | Description             |
+| -------------------- | ----------------------- |
+| `npm run start:dev`  | Start in watch mode     |
+| `npm run start`      | Start the server        |
+| `npm run start:prod` | Run the compiled build  |
+| `npm run build`      | Compile to `dist/`      |
+| `npm run lint`       | Lint and auto-fix       |
+| `npm run format`     | Format with Prettier    |
+| `npm run test`       | Run unit tests          |
+| `npm run test:e2e`   | Run end-to-end tests    |
+| `npm run test:cov`   | Run tests with coverage |
+
+## Project Structure
+
+```
+src/
+├── auth/        # Registration, login, JWT guard
+├── users/       # Profile management
+├── subjects/    # Subject CRUD
+├── topics/      # Topic status + roadmap orchestration
+├── ai/          # Gemini integration & prompt
+├── prisma/      # Prisma service/module
+├── common/      # Shared types & decorators
+└── main.ts      # Bootstrap (CORS, validation, Swagger)
+prisma/          # Schema & migrations
+```
