@@ -52,6 +52,7 @@ export class TopicsService {
 
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
 
       const existing = await this.prismaService.review.findUnique({
         where: {
