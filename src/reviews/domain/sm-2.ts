@@ -8,8 +8,9 @@ export function applyReview(
 
   const updatedState = { ...state };
 
-  updatedState.easeFactor +=
-    0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02);
+  updatedState.easeFactor =
+    updatedState.easeFactor +
+    (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
   updatedState.easeFactor = Math.max(1.3, updatedState.easeFactor);
 
   if (quality >= 3) {
