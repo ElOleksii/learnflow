@@ -15,12 +15,13 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  name          String
-  password      String
-  streakDays    Int       @default(0) @map("streak_days")
-  lastStudyDate DateTime? @map("last_study_date")
+  id             String    @id @default(uuid())
+  email          String    @unique
+  name           String
+  password       String
+  streakDays     Int       @default(0) @map("streak_days")
+  lastStudyDate  DateTime? @map("last_study_date")
+  minutesPerWeek Int       @map("minutes_per_week")
 
   subjects      Subject[]
   scheduleItems ScheduleItem[]
@@ -36,12 +37,11 @@ enum SubjectStatus {
 }
 
 model Subject {
-  id           String        @id @default(uuid())
-  name         String
-  description  String?
-  hoursPerWeek Int           @default(0) @map("hours_per_week")
-  status       SubjectStatus @default(ACTIVE)
-  userId       String        @map("user_id")
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  status      SubjectStatus @default(ACTIVE)
+  userId      String        @map("user_id")
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   topics Topic[]
@@ -57,13 +57,13 @@ enum TopicStatus {
 }
 
 model Topic {
-  id             String      @id @default(uuid())
-  name           String
-  description    String?
-  estimatedHours Int         @map("estimated_hours")
-  order          Int
-  status         TopicStatus @default(NOT_STARTED)
-  subjectId      String
+  id               String      @id @default(uuid())
+  name             String
+  description      String?
+  estimatedMinutes Int         @map("estimated_hours")
+  order            Int
+  status           TopicStatus @default(NOT_STARTED)
+  subjectId        String
 
   subject          Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   prerequisites    Topic[]        @relation("TopicPrerequisities")
