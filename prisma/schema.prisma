@@ -21,7 +21,7 @@ model User {
   password       String
   streakDays     Int       @default(0) @map("streak_days")
   lastStudyDate  DateTime? @map("last_study_date")
-  minutesPerWeek Int       @map("minutes_per_week")
+  dailyMinutes Int       @map("dailyMinutes")
 
   subjects      Subject[]
   scheduleItems ScheduleItem[]
