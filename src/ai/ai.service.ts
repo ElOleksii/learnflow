@@ -6,7 +6,7 @@ import { generateRoadmapPrompt } from './prompt';
 interface GeneratedTopic {
   name: string;
   description: string;
-  estimatedHours: number;
+  estimatedMinutes: number;
   order: number;
   prerequisites: string[];
 }

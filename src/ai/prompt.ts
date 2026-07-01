@@ -9,7 +9,7 @@ Rules:
 2. Each topic must have all fields:
    - name (string)
    - description (string)
-   - estimatedHours (number, between 2 and 10)
+   - estimatedMinutes (number, time in minutes)
    - order (number, starting from 1)
    - prerequisites (array of topic names that must come before this topic)
 3. All prerequisites must refer to other topic names in the same array.

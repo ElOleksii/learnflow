@@ -115,7 +115,7 @@ export class TopicsService {
             name: t.name,
             description: t.description,
             order: t.order,
-            estimatedHours: t.estimatedHours,
+            estimatedMinutes: t.estimatedMinutes,
           },
         }),
       ),
