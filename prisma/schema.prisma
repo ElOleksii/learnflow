@@ -15,13 +15,13 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(uuid())
-  email          String    @unique
-  name           String
-  password       String
-  streakDays     Int       @default(0) @map("streak_days")
-  lastStudyDate  DateTime? @map("last_study_date")
-  dailyMinutes Int       @map("dailyMinutes")
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  password      String
+  streakDays    Int       @default(0) @map("streak_days")
+  lastStudyDate DateTime? @map("last_study_date")
+  dailyMinutes  Int       @default(60) @map("daily_minutes")
 
   subjects      Subject[]
   scheduleItems ScheduleItem[]
