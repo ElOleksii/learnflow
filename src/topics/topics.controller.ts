@@ -4,12 +4,25 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import type { JwtPayload } from 'src/common/types';
 import { UpdateTopicStatus } from './dto/update-topic-status.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @UseGuards(AuthGuard)
+@ApiBearerAuth()
+@ApiTags('Topics')
 @Controller('topics')
 export class TopicsController {
   constructor(private readonly topicsService: TopicsService) {}
 
+  @ApiOperation({ summary: 'Update the status of a topic' })
+  @ApiParam({ name: 'id', description: 'UUID of the topic' })
+  @ApiResponse({ status: 200, description: 'Topic status updated successfully.' })
+  @ApiResponse({ status: 404, description: 'Topic not found.' })
   @Patch(':id/status')
   updateTopicStatus(
     @CurrentUser() user: JwtPayload,

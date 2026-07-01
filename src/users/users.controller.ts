@@ -15,7 +15,6 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -29,18 +28,13 @@ export class UsersController {
 
   @ApiOperation({
     summary: 'Get current user profile',
-    description: 'Returns current user profile info.',
-  })
-  @ApiParam({
-    name: 'userId',
-    type: 'string',
-    description: 'UUID of the current user',
+    description: 'Returns the profile of the authenticated user.',
   })
   @ApiResponse({
     status: 200,
-    description: 'User profile retrived successfully',
-    type: Number,
+    description: 'User profile retrieved successfully.',
   })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @Get('me')
   getUserProfile(@CurrentUser() currentUser: JwtPayload) {
     return this.userService.getUserInfo(currentUser.sub);
@@ -48,18 +42,13 @@ export class UsersController {
 
   @ApiOperation({
     summary: 'Update current user profile',
-    description: 'Updates email and/or name of the user.',
-  })
-  @ApiParam({
-    name: 'userId',
-    type: 'string',
-    description: 'UUID of the current user',
+    description: 'Updates the email and/or name of the authenticated user.',
   })
   @ApiResponse({
     status: 200,
-    description: 'User profile updated successfully',
-    type: UpdateUserDto,
+    description: 'User profile updated successfully.',
   })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @Patch('me')
   updateUserProfile(
     @CurrentUser() currentUser: JwtPayload,
@@ -70,18 +59,13 @@ export class UsersController {
 
   @ApiOperation({
     summary: 'Update current user password',
-    description: 'Update the password for the current user.',
-  })
-  @ApiParam({
-    name: 'userId',
-    type: 'string',
-    description: 'UUID of the current user',
+    description: 'Updates the password for the authenticated user.',
   })
   @ApiResponse({
     status: 200,
-    description: 'User password was updated successfully',
-    type: UpdatePasswordDto,
+    description: 'User password updated successfully.',
   })
+  @ApiResponse({ status: 401, description: 'Unauthorized or wrong password.' })
   @Patch('me/password')
   updateUserPassword(
     @CurrentUser() currentUser: JwtPayload,
@@ -92,13 +76,10 @@ export class UsersController {
 
   @ApiOperation({
     summary: 'Delete current user',
-    description: 'Delete the current user account.',
+    description: 'Deletes the authenticated user account.',
   })
-  @ApiResponse({
-    status: 200,
-    description: 'User deleted successfully',
-    type: Number,
-  })
+  @ApiResponse({ status: 200, description: 'User deleted successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @Delete('me')
   deleteUser(@CurrentUser() currentUser: JwtPayload) {
     return this.userService.deleteUser(currentUser.sub);
